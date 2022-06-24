@@ -10,17 +10,17 @@ import (
 )
 
 type Feed struct {
-	Entries []Entry `xml:"entry"`
+	Entries []Entry `xml:"entry" json:"entry"`
 }
 
 type Entry struct {
-	Title string `xml:"title"`
+	Title string `xml:"title" json:"title"`
 	Link  struct {
-		Href string `xml:"href,attr"`
-	} `xml:"link"`
+		Href string `xml:"href,attr" json:"href"`
+	} `xml:"link" json:"link"`
 	Thumbnail struct {
-		URL string `xml:"url,attr"`
-	} `xml:"thumbnail"`
+		URL string `xml:"url,attr" json:"url"`
+	} `xml:"thumbnail" json:"thumbnail"`
 }
 
 // Performs the parsing
