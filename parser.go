@@ -9,22 +9,37 @@ import (
 	"time"
 )
 
-type Feed struct {
-	Entries []Entry `xml:"entry" json:"entry"`
+type feed struct {
+	Entries []entry `xml:"entry" json:"entry"`
 }
 
-type Entry struct {
+type entry struct {
 	Title string `xml:"title" json:"title"`
-	Link  struct {
+
+	Author struct {
+		Name string `xml:"name" json:"name"`
+		URI  string `xml:"uri" json:"uri"`
+	} `xml:"author" json:"author"`
+
+	Content struct {
+		Type  string `xml:"type,attr" json:"type"`
+		Value string `xml:",innerxml" json:"content"`
+	} `xml:"content" json:"content"`
+
+	Link struct {
 		Href string `xml:"href,attr" json:"href"`
 	} `xml:"link" json:"link"`
+
 	Thumbnail struct {
 		URL string `xml:"url,attr" json:"url"`
 	} `xml:"thumbnail" json:"thumbnail"`
+
+	Updated   time.Time `xml:"updated" json:"updated"`
+	Published time.Time `xml:"published" json:"published"`
 }
 
 // Performs the parsing
-func getFeedEntries(u string) ([]Entry, error) {
+func getFeedEntries(u string) ([]entry, error) {
 	u = u + ".rss"
 	request, err := http.NewRequest("GET", u, nil)
 	if err != nil {
@@ -45,7 +60,7 @@ func getFeedEntries(u string) ([]Entry, error) {
 
 	defer response.Body.Close()
 	feedByte, _ := ioutil.ReadAll(response.Body)
-	var feed Feed
+	var feed feed
 	err = xml.Unmarshal(feedByte, &feed)
 	if err != nil {
 		return nil, err
@@ -66,7 +81,7 @@ func isValidSubredditURL(rawURL string) bool {
 		return false
 	}
 
-	if !strings.HasSuffix(url.Path, "/"){
+	if !strings.HasSuffix(url.Path, "/") {
 		url.Path = url.Path + "/"
 	}
 	path := strings.Split(url.Path, "/")
