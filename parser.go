@@ -60,21 +60,17 @@ func isValidSubredditURL(rawURL string) bool {
 		return false
 	}
 	validHostname := "reddit.com"
+
+	// confirm host
 	if url.Host != validHostname && url.Host != "www."+validHostname {
 		return false
 	}
 
-	unCleanPath := strings.Split(url.Path, "/")
-	if len(unCleanPath) > 4 {
-		return false
+	if !strings.HasSuffix(url.Path, "/"){
+		url.Path = url.Path + "/"
 	}
-
-	var cleanPath []string
-	for _, str := range unCleanPath {
-		if str != "" {
-			cleanPath = append(cleanPath, str)
-		}
-	}
-	pathLen := len(cleanPath)
-	return pathLen > 0 && cleanPath[0] == "r" && pathLen <= 2
+	path := strings.Split(url.Path, "/")
+	// confirm url path is within the formats ["/r", "/r/", "/r/topic", "/r/topic/"]
+	// this means the path can not be /r/topic/another-string
+	return len(path) > 1 && path[1] == "r" && len(path) <= 4
 }
